@@ -1,0 +1,295 @@
+navbarPage(
+  title = "EMIL&MATEUSZxPOL sp. z.o.o",
+  tabPanel("Modyfkacje",
+           navlistPanel(widths = c(1,11),
+                        "Dane",
+                        tabPanel("Trenerzy",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Strzelnicy_T", label = "Id Strzelnicy*",
+                                                      choices = c("")),
+                                          
+                                          textInput(inputId = "Id_Nr_Licencji_T", label = "Nr Licencji (np. AAA-123456)*"),
+                                          
+                                          textInput(inputId = "Id_Imie_T", label = "Imie*"),
+                                          
+                                          textInput(inputId = "Id_Nazwisko_T", label = "Nazwisko*"),
+                                          
+                                          textInput(inputId = "Id_Pesel_T", label = "Pesel*"),
+                                          
+                                          selectInput("Id_Klasa", label ="Klasa*", 
+                                                      choices = list("Wybierz" = "", "Mistrzowska" = "M", "I" = "I", "II" = "II",
+                                                                     "III" = "III","IV" = "IV"), 
+                                                      selected = 1),
+                                          
+                                          textInput(inputId = "Id_Nr_Tel_T", label = "Telefon (np. 123456789)*"),
+                                          
+                                          actionButton(inputId = "Trenerzy_add_id", label = "DODAJ Trenera"),
+                                          
+                                          actionButton(inputId = "Trenerzy_upd_id", label = "AKTUALIZUJ")
+                                        )),
+                                 column(7,
+                                        uiOutput("r_tren_Id"),
+                                        DT::dataTableOutput(outputId ="tab_tren_id")
+                                        
+                                 )),
+                        tabPanel("Kierownicy",
+                                 column(5,
+                                        sidebarPanel(
+                                          textInput(inputId = "Id_Imie_K", label = "Imie*"),
+                                          
+                                          textInput(inputId = "Id_Nazwisko_K", label = "Nazwisko*"),
+                                          
+                                          textInput(inputId = "Id_Pesel_K", label = "Pesel*"),
+                                          
+                                          textInput(inputId = "Id_Nr_Tel_K", label = "Telefon (np. 123456789)*"),
+                                          
+                                          actionButton(inputId = "Kierownik_add_id", label = "DODAJ Kierownika"),
+                                          
+                                          selectInput(inputId = "Id_Kierwonika_K", label = "Id Kierownika",
+                                                      choices = c("")),
+                                          
+                                          textInput(inputId = "Id_Nowy_Nr_Tel_K", label = "Nowy Telefon (np. 123456789)"),
+                                          
+                                          actionButton(inputId = "Kierownik_upd_id", label = "AKTUALIZUJ")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_kier_id")
+                                        
+                                 )),
+                        tabPanel("Opiekunowie",
+                                 column(5,
+                                        sidebarPanel(
+                                          textInput(inputId = "Id_Imie_O", label = "Imie*"),
+                                          
+                                          textInput(inputId = "Id_Nazwisko_O", label = "Nazwisko*"),
+                                          
+                                          textInput(inputId = "Id_Nr_Pozwolenia_O", label = "Nr Pozwolenia (np. AA-1234)*"),
+                                          
+                                          textInput(inputId = "Id_Pesel_O", label = "Pesel*"),
+                                          
+                                          actionButton(inputId = "Opiekunowie_add_id", label = "DODAJ Opiekuna")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_opie_id")
+                                        
+                                 )),
+                        tabPanel("Serisanci",
+                                 column(5,
+                                        sidebarPanel(
+                                          textInput(inputId = "Id_Imie_Se", label = "Imie*"),
+                                          
+                                          textInput(inputId = "Id_Nazwisko_Se", label = "Nazwisko*"),
+                                          
+                                          textInput(inputId = "Id_Miasto_Se", label = "Miasto*"),
+                                          
+                                          textInput(inputId = "Id_Adres_Se", label = "Adres*"),
+                                          
+                                          actionButton(inputId = "Serwisant_add_id", label = "DODAJ Serwisanta"),
+                                          
+                                          selectInput(inputId = "Id_Serwisanta", label = "Id Serwisanta",
+                                                      choices = c("")),
+                                          
+                                          selectInput(inputId = "Id_Typu_Broni_Se", label = "Id Typu Broni",
+                                                      choices =  c("")),
+                                          
+                                          actionButton(inputId = "Profesja_add_id", label = "DODAJ Profesje")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_so_id")
+                                 )),
+                        
+                        tabPanel("Rodzaje_Broni",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Typu_Broni_R", label = "Id Typu Broni*",
+                                                      choices = ""),
+                                          
+                                          textInput(inputId = "Id_Model_R", label = "Model*"),
+                                          
+                                          sliderInput(inputId = "Id_Kaliber_R", label = "Kaliber*",
+                                                      min = 0.4, max = 7, value = 0.4, step = 0.2),
+                                          
+                                          textInput(inputId = "Id_Producent_R", label = "Producent*"),
+                                          
+                                          textInput(inputId = "Id_Pochodzenie_R", label = "Pochodzenie*"),
+                                          
+                                          selectInput("rok_w", label ="Rodz Wynalezienia", choices = c("NULL","Wybierz"),selected = "NULL" ),
+                                          
+                                          # sliderInput(inputId = "Id_Rok_R", label = "Rok Wynalezienia",
+                                          #             min = 1800, max = strtoi(substr(Sys.Date(),1,4)), value = 1800),
+                                          uiOutput("rodz"),
+                                          
+                                          actionButton(inputId = "Rodzaj_Broni_add_id", label = "DODAJ Rodzaj")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_rodz_id")
+                                 )),
+                        tabPanel("Ammo",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Typu_Broni_A", label = "Typ Broni*",
+                                                      choices = c("")),
+                                          
+                                          textInput(inputId = "Id_Nazwa_A", label = "Nazwa*"),
+                                          
+                                          sliderInput(inputId = "Id_Kaliber_A", label = "Kaliber*",
+                                                      min = 0.4, max = 7, value = 0.4, step = 0.2),
+                                          
+                                          textInput(inputId = "Id_Producent_A", label = "Producent*"),
+                                          
+                                          dateInput("Id_Data_A", label = "Data Produkcji*"),
+                                          
+                                          actionButton(inputId = "Ammo_add_id", label = "DODAJ Amunicje")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_ammo_id")
+                                 )),
+                        tabPanel("Strzelnice",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Magazynu_St", label = "Id Magazynu*",choices = c("")),
+                                          
+                                          textInput(inputId = "Id_Miasto_St", label = "Miasto*"),
+                                          
+                                          textInput(inputId = "Id_Adres_St", label = "Adres*"),
+                                          
+                                          actionButton(inputId = "Strzelnica_add_id", label = "DODAJ Strzelnice")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_strze_id")
+                                 )),
+                        tabPanel("Magazyn",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Kierownika_M", label = "Kierownik*",
+                                                      choices = c("")),
+                                          
+                                          textInput(inputId = "Id_Miasto_M", label = "Miasto*"),
+                                          
+                                          textInput(inputId = "Id_Adres_M", label = "Adres*"),
+                                          
+                                          textInput(inputId = "Id_Pojemnosc_Ammo_M", label = "Pojemnosc Ammo*"),
+                                          
+                                          textInput(inputId = "Id_Pojemnosc_Broni_M", label = "Pojemnosc Broni*"),
+                                          
+                                          actionButton(inputId = "Magazyn_add_id", label = "DODAJ Magazyn"),
+                                          
+                                          selectInput(inputId = "Id_Magazynu_M", label = "Id Magazynu",
+                                                      choices = c("")),
+                                          
+                                          actionButton(inputId = "Magazyn_upd_id", label = "AKTUALIZUJ")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_mag_id")
+                                 ))
+           )),
+  
+  tabPanel("Stan Magazynow",
+           navlistPanel(widths = c(1,11),
+                        "Magazyn",
+                        tabPanel("ALL",
+                                 DT::dataTableOutput(outputId ="tab_widok_all_id") #widok all wszystko
+                        ),
+                        tabPanel("Ammo",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Ammo_MA", label = "Id Ammo*",
+                                                      choices = c("")),
+                                          
+                                          selectInput(inputId = "Id_Magazynu_MA", label = "Id Magazynu*",
+                                                      choices = ("1"),selected = "1"),
+                                          
+                                          textInput("Id_Iloscu_MA",label ="Ilosc*"),
+                                          
+                                          
+                                          actionButton(inputId = "Amunicja_add_id", label = "DODAJ Amunicje")
+                                          
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_magammo_id")
+                                 )),
+                        
+                        tabPanel("Bron",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Rodzaju_E", label = "Id Rodzaju*",
+                                                      choices = c("1"),selected = "1"),
+                                          
+                                          textInput(inputId = "Id_Nr_Seryjny_E", label = "Nr Seryjny (np. AAA-0123456789)*"),
+                                          
+                                          selectInput(inputId = "Id_Magazynu_E", label = "Id Magazynu*",
+                                                      choices = c("")),
+                                          
+                                          selectInput(inputId = "Id_Wlasciciela_E", label = "Id Wlasciciela*",
+                                                      choices = c("")),
+                                          
+                                          uiOutput("mm"),
+                                          
+                                          actionButton(inputId = "Egzemplarz_add_id", label = "DODAJ Bron"),
+                                          
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_egz_id")
+                                 ))
+                        
+           )),
+  
+  tabPanel("Serwis",
+           navlistPanel(widths = c(1,11),
+                        "Dane",
+                        tabPanel("Ostatnie serwisy",
+                                 column(5,
+                                        sidebarPanel(
+                                          selectInput(inputId = "Id_Nr_Seryjny_Ser", label = "Nr Seryjny*",
+                                                      choices =  c("")),
+                                          
+                                          selectInput(inputId = "Id_Serwisant_Ser", label = "Id Serwisanta*",
+                                                      choices = c("")),
+                                          
+                                          actionButton(inputId = "Serwis_add_id", label = "Oddaj do seriwsu"),
+                                          
+                                          selectInput(inputId = "Id_Nr_Zlecenia_Ser", label = "Nr Seryjny*"
+                                                      ,choices =  c("")),
+                                          
+                                          textInput(inputId = "Id_Not_Ser", label = "Notatka"),
+                                          
+                                          actionButton(inputId = "Serwis_oddaj_add_id", label = "Przyjmij z seriwsu")
+                                        )),
+                                 column(7,
+                                        DT::dataTableOutput(outputId ="tab_ost_id")
+                                 )),
+                        tabPanel("Profesje Serwisantow",
+                                 
+                                 DT::dataTableOutput(outputId ="tab_prof_id")
+                                 
+                        ),
+                        tabPanel("Archiwum",
+                                 dateRangeInput("Archiwum_Id", label = "Zakres"),
+                                 DT::dataTableOutput(outputId ="tab_ser_id")
+                        ))
+  ),
+  
+  tabPanel("Dla Klienta",
+           navlistPanel(widths = c(1,11),
+                        "INFO",
+                        tabPanel("Dostepne Bronie",
+                                 
+                                 DT::dataTableOutput(outputId ="tab_dos_id")
+                        ),
+                        tabPanel("Statystyka Trenerow",
+                                 
+                                 DT::dataTableOutput(outputId ="tab_klas_id")
+                        ),
+                        tabPanel("Statystyka Broni",
+                                 
+                                 DT::dataTableOutput(outputId ="tab_licz_bro_id")
+                        ),
+                        tabPanel("Kontakt magazyny",
+                                 
+                                 DT::dataTableOutput(outputId ="tab_magy_id")
+                        ))
+  )
+)
+
+

@@ -1,0 +1,396 @@
+source("conn.R")
+library(shiny)
+library(DT)
+function(input, output,session){
+  # wstawianie tabel do apki
+  output$tab_magy_id <- DT::renderDataTable({
+    dbGetQuery(con, "SELECT * FROM Magazyny;")
+  })
+  
+  output$tab_egz_id <- DT::renderDataTable({
+    input$Serwis_add_id
+    input$Egzemplarz_add_id
+    dbGetQuery(con, "SELECT * FROM egzemplarz_broni;")
+  })
+  output$tab_ammo_id <- DT::renderDataTable({
+    input$Ammo_add_id
+    dbGetQuery(con, "SELECT * FROM amunicja;")
+  })
+  output$tab_tren_id <- DT::renderDataTable({
+    input$Trenerzy_upd_id
+    input$Trenerzy_add_id
+    dbGetQuery(con, "SELECT * FROM trenerzy;")
+  })
+  output$tab_opie_id <- DT::renderDataTable({
+    input$Opiekunowie_add_id
+    dbGetQuery(con, "SELECT * FROM opiekunowie;")
+  })
+  output$tab_so_id <- DT::renderDataTable({
+    input$Serwisant_add_id
+    dbGetQuery(con, "SELECT * FROM serwisanci;")
+  })
+  output$tab_strze_id <- DT::renderDataTable({
+    input$Strzelnica_add_id
+    dbGetQuery(con, "SELECT * FROM strzelnica;")
+  })
+  output$tab_rodz_id <- DT::renderDataTable({
+    input$Rodzaj_Broni_add_id
+    dbGetQuery(con, "SELECT * FROM rodzaje_broni;")
+  })
+  output$tab_widok_all_id <- DT::renderDataTable({
+    dbGetQuery(con, "SELECT * FROM Ilosc_W_Mag;")
+  })
+  output$tab_magammo_id <- DT::renderDataTable({
+    input$Amunicja_add_id
+    dbGetQuery(con, "SELECT * FROM Ile_Ammoo;")
+  })
+  output$tab_kier_id <- DT::renderDataTable({
+    input$Kierownik_add_id
+    input$Kierownik_upd_id
+    dbGetQuery(con, "SELECT * FROM Kierownicy;")
+  })
+  output$tab_ost_id <- DT::renderDataTable({
+    input$Serwis_add_id
+    dbGetQuery(con, "SELECT * FROM Ostatni_Serwis_Plus;")
+  })
+  output$tab_ser_id <- DT::renderDataTable({
+    input$Serwis_add_id
+    input$Serwis_oddaj_add_id
+    dbGetQuery(con,paste0("SELECT * FROM Serwis WHERE data_serwisu BETWEEN '",input$Archiwum_Id[1],
+                          "' AND '",input$Archiwum_Id[2],"';"))
+  })
+  output$tab_prof_id <- DT::renderDataTable({
+    dbGetQuery(con, "SELECT * FROM Ladny_Widok;")
+  })
+  output$tab_dos_id <- DT::renderDataTable({
+    dbGetQuery(con, "SELECT * FROM Dostepne_Bronie;")
+  })
+  output$tab_klas_id <- DT::renderDataTable({
+    dbGetQuery(con, "SELECT * FROM Klasy_Trenerow;")
+  })
+  output$tab_licz_bro_id <- DT::renderDataTable({
+    dbGetQuery(con, "SELECT * FROM Licznosc_Modeli;")
+  })
+  output$tab_mag_id <- DT::renderDataTable({
+    input$Magazyn_upd_id
+    input$Magazyn_add_id
+    dbGetQuery(con, "SELECT * FROM Magazyn;")
+  })
+  
+  
+  
+  #robienie insertow i updatow
+  observeEvent(input$Rodzaj_Broni_add_id,{
+    if(input$Id_Typu_Broni_R == "" ||input$Id_Model_R == ""|| input$Id_Kaliber_R ==""||
+       input$Id_Producent_R == ""|| input$Id_Pochodzenie_R == ""||
+       input$Id_Rok_R== "" || nchar(input$Id_Rok_R) !=4 ){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                           oraz czy dane sa poprawnie wprowadzone",
+                           easyClose = TRUE,footer = NULL))  
+      
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO rodzaje_broni(id_typu_broni,model,kaliber,producent,
+    pochodzenie,rok_wynalezienia) VALUES(",input$Id_Typu_Broni_R,",'",input$Id_Model_R,"',"
+                           ,input$Id_Kaliber_R,",'",input$Id_Producent_R,"','",input$Id_Pochodzenie_R,
+                           "','",input$Id_Rok_R,"');"))
+    
+    dbClearResult(res)
+    }
+    })
+  observeEvent(input$Trenerzy_add_id,{
+    if(input$Id_Strzelnicy_T == "" ||input$Id_Nr_Licencji_T || input$Id_Imie_T ==""||
+       input$Id_Nazwisko_T == ""   || input$Id_Pesel_T == "" ||
+       input$Id_Klasa == ""        || input$Id_Nr_Tel_T == ""||
+       nchar(input$Id_Pesel_T) != 11 || nchar(input$Id_Nr_Tel_T) != 9){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO trenerzy VALUES(",input$Id_Strzelnicy_T,",'",input$Id_Nr_Licencji_T,"','"
+                           ,input$Id_Imie_T,"','",input$Id_Nazwisko_T,"','",input$Id_Pesel_T,
+                           "','",input$Id_Klasa,"','",input$Id_Nr_Tel_T,"');"))
+    
+    dbClearResult(res)
+    }
+    })
+  observeEvent(input$Trenerzy_upd_id,{
+    if (input$Id_Klasa == ""){
+    query <- paste0("UPDATE trenerzy SET id_strzelnicy = ",input$Id_Strzelnicy_T,
+                            " WHERE nr_licencji = '",input$Id_Nr_Licencji_T,"';")}
+    else if (input$Id_Strzelnicy_T == ""){
+      query <- paste0("UPDATE trenerzy SET klasa = '",input$Id_Klasa,
+                      "' WHERE nr_licencji = '",input$Id_Nr_Licencji_T,"';")}
+    else {
+      query <- paste0("UPDATE trenerzy SET klasa = '",input$Id_Klasa,
+                      "',id_strzelnicy =",input$Id_Strzelnicy_T,"  WHERE nr_licencji = '",input$Id_Nr_Licencji_T,"';")}
+    res <- dbSendQuery(con,query)
+   dbClearResult(res)
+  })
+  observeEvent(input$Kierownik_add_id,{
+    if(input$Id_Imie_K == "" ||input$Id_Nazwisko_K|| input$Id_Pesel_K ==""||
+       input$Id_Nr_Tel_K == ""|| nchar(input$Id_Pesel_K) != 11 ||
+       nchar(input$Id_Nr_Tel_K) != 9){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else {
+    res <-dbSendQuery(con,paste0("INSERT INTO kierownicy (Imie,Nazwisko,Pesel,Nr_Telefonu) 
+                                 VALUES('",input$Id_Imie_K,"','",input$Id_Nazwisko_K,"','"
+                                 ,input$Id_Pesel_K,"','",input$Id_Nr_Tel_K,"');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Kierownik_upd_id,{
+    
+    res <- dbSendQuery(con, paste0("UPDATE kierownicy SET nr_telefonu = '",input$Id_Nowy_Nr_Tel_K,
+                                   "' WHERE id_kierownika = '",input$Id_Kierwonika_K,"';"))
+    dbClearResult(res)
+  })
+  observeEvent(input$Opiekunowie_add_id,{
+    if(input$Id_Imie_O == "" ||input$Id_Nazwisko_O|| input$Id_Nr_Pozwolenia_O ==""||
+       input$Id_Pesel_O == ""|| nchar(input$Id_Pesel_O)==11){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO opiekunowie (Imie,Nazwisko,Nr_Pozwolenia,Pesel) 
+                                 VALUES('",input$Id_Imie_O,"','",input$Id_Nazwisko_O,"','"
+                                 ,input$Id_Nr_Pozwolenia_O,"','",input$Id_Pesel_O,"');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Serwisant_add_id,{
+    if(input$Id_Imie_Se == "" ||input$Id_Nazwisko_Se|| input$Id_Miasto_Se ==""||
+       input$Id_Adres_Se == ""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO serwisanci (Imie ,Nazwisko ,Miasto ,Adres) 
+                                 VALUES('",input$Id_Imie_Se,"','",input$Id_Nazwisko_Se,"','"
+                                 ,input$Id_Miasto_Se,"','",input$Id_Adres_Se,"');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Profesja_add_id,{
+    if(input$Id_Typu_Broni_Se == "" ||input$Id_Serwisanta){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else {
+    res <- dbSendQuery(con, paste0("INSERT INTO profesja VALUES(",input$Id_Typu_Broni_Se,",",
+                                   input$Id_Serwisanta,"');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Ammo_add_id,{
+    if(input$Id_Typu_Broni_A == "" ||input$Id_Nazwa_A==""|| input$Id_Kaliber_A ==""||
+       input$Id_Producent_A == "" ||input$Id_Data_A== ""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO amunicja (Id_Typu_Broni ,Nazwa ,
+                                  Kaliber ,Producent ,Data_Produkcji) 
+                                 VALUES(",input$Id_Typu_Broni_A,",'",input$Id_Nazwa_A,"',"
+                                 ,input$Id_Kaliber_A,",'",input$Id_Producent_A,
+                                 "','",input$Id_Data_A,"');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Strzelnica_add_id,{
+    if(input$Id_Magazynu_St == "" ||input$Id_Miasto_St==""|| input$Id_Adres_St ==""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO strzelnica (Id_Magazynu,Miasto,Adres) 
+                                 VALUES(",input$Id_Magazynu_St,",'",input$Id_Miasto_St,"','"
+                                 ,input$Id_Adres_St,"');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Magazyn_add_id,{
+    if(input$Id_Kierownika_M == "" ||input$Id_Miasto_M==""|| input$Id_Adres_M ==""
+       || input$Id_Pojemnosc_Ammo_M ==""|| input$Id_Pojemnosc_Broni_M ==""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO magazyn (Id_Kierownika,Miasto,
+                                  Adres,Pojemnosc_Ammo,Pojemnosc_Broni) 
+                                 VALUES(",input$Id_Kierownika_M,",'",input$Id_Miasto_M,"','"
+                                 ,input$Id_Adres_M,"',",input$Id_Pojemnosc_Ammo_M,","
+                                 ,input$Id_Pojemnosc_Broni_M,");"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Magazyn_upd_id,{
+    if (input$Id_Pojemnosc_Ammo_M == ""){
+      query <- paste0("UPDATE magazyn SET pojemnosc_broni = ",input$Id_Pojemnosc_Broni_M,
+                      " WHERE id_magazynu = ",input$Id_Magazynu_M,";")}
+    else if (input$Id_Pojemnosc_Broni_M == ""){
+      query <- paste0("UPDATE magazyn SET pojemnosc_ammo = ",input$Id_Pojemnosc_Ammo_M,
+                      " WHERE id_magazynu = ",input$Id_Magazynu_M,";")}
+    else {
+      query <- paste0("UPDATE magazyn SET pojemnosc_broni = ",input$Id_Pojemnosc_Broni_M,
+                      ", pojemnosc_ammo = ", input$Id_Pojemnosc_Ammo_M,
+                      " WHERE id_magazynu = ",input$Id_Magazynu_M,";")}
+    res <-dbSendQuery(con,query)
+    dbClearResult(res)
+    })
+  observeEvent(input$Amunicja_add_id,{
+    if(input$Id_Magazynu_MA == "" ||input$Id_Ammo_MA==""|| input$Id_Iloscu_MA ==""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO magazyn_ammo (Id_Ammo,Id_Magazynu,Ilosc) 
+                                 VALUES(",input$Id_Ammo_MA,",",input$Id_Magazynu_MA,","
+                                 ,input$Id_Iloscu_MA,");"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Egzemplarz_add_id,{
+    if(input$Id_Rodzaju_E == "" ||input$Id_Nr_Seryjny_E==""|| input$Id_Magazynu_E ==""
+       || input$Id_Wlasciciela_E ==""|| input$Id_Rok_Produkcji_E ==""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("INSERT INTO egzemplarz_broni (Id_Rodzaju,Nr_Seryjny,Id_Magazynu,
+                                  Id_Wlasciciela,Rok_Produkcji,Stan) 
+                                  VALUES(",input$Id_Rodzaju_E,",'",input$Id_Nr_Seryjny_E,"',"
+                                 ,input$Id_Magazynu_E,",",input$Id_Wlasciciela_E,",'",input$Id_Rok_Produkcji_E,
+                                 "','dostepny');"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Serwis_add_id,{
+    if(input$Id_Nr_Seryjny_Ser == "" ||input$Id_Serwisant_Ser==""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("SELECT bron_do_serwisu('",input$Id_Nr_Seryjny_Ser,"',",
+                      input$Id_Serwisant_Ser,");"))
+    dbClearResult(res)
+    }
+  })
+  observeEvent(input$Serwis_oddaj_add_id,{
+    if(input$Id_Nr_Zlecenia_Ser == "" ||input$Id_Not_Ser==""){
+      showModal(modalDialog(title = "Blad danych",
+                            "Sprawdz czy wprowadzilas/es wszystkie wymagane dany 
+                            oraz czy dane sa poprawnie wprowadzone",
+                            easyClose = TRUE,footer = NULL))  
+    }
+    else{
+    res <-dbSendQuery(con,paste0("SELECT bron_z_serwisu(",input$Id_Nr_Zlecenia_Ser,",'",
+                                 input$Id_Not_Ser,"');"))
+    dbClearResult(res)
+    }
+  })
+# obsluga selectinput'ow
+  observe({
+    
+    input$Strzelnica_add_id
+    input$Serwisant_add_id
+    input$Magazyn_add_id
+    input$Kierownik_add_id
+    input$Ammo_add_id
+    input$Rodzaj_Broni_add_id
+    input$Opiekunowie_add_id
+    input$Egzemplarz_add_id
+    input$Serwis_add_id
+    input$Serwis_oddaj_add_id
+    updateSelectInput(session, "Id_Magazynu_St", 
+                      choices = dbGetQuery(con,"SELECT id_magazynu FROM magazyn;"),selected = "")
+    updateSelectInput(session, "Id_Strzelnicy_T", 
+                      choices = dbGetQuery(con,"SELECT id_strzelnicy FROM strzelnica;"),selected = "")
+    updateSelectInput(session, "Id_Typu_Broni_Se", 
+                      choices = dbGetQuery(con,"SELECT id_typu_broni FROM typ_broni;"),selected = "")
+    updateSelectInput(session, "Id_Serwisanta", 
+                      choices = dbGetQuery(con,"SELECT id_serwisanta FROM serwisanci;"),selected = "")
+    updateSelectInput(session, "Id_Typu_Broni_R", 
+                      choices = dbGetQuery(con,"SELECT id_typu_broni FROM typ_broni;"),selected = "")
+    updateSelectInput(session, "Id_Typu_Broni_A", 
+                      choices = dbGetQuery(con,"SELECT id_typu_broni FROM typ_broni;"),selected = "")
+    updateSelectInput(session, "Id_Kierownika_M", 
+                      choices = dbGetQuery(con,"SELECT id_kierownika FROM kierownicy;"),selected = "")
+    updateSelectInput(session, "Id_Magazynu_M", 
+                      choices = dbGetQuery(con,"SELECT id_magazynu FROM magazyn;"),selected = "")
+    updateSelectInput(session, "Id_Ammo_MA", 
+                      choices = dbGetQuery(con,"SELECT id_ammo FROM amunicja;"),selected = "")
+    updateSelectInput(session, "Id_Magazynu_MA", 
+                      choices = dbGetQuery(con,"SELECT id_magazynu FROM magazyn;"),selected = "1")
+    updateSelectInput(session, "Id_Rodzaju_E", 
+                      choices = dbGetQuery(con,"SELECT id_rodzaju FROM rodzaje_broni;"),selected = "1")
+    updateSelectInput(session, "Id_Magazynu_E", 
+                      choices = dbGetQuery(con,"SELECT id_magazynu FROM magazyn;"),selected = "")
+    updateSelectInput(session, "Id_Wlasciciela_E", 
+                      choices = dbGetQuery(con,"SELECT id_wlasciciela FROM opiekunowie;"),selected = "")
+    updateSelectInput(session, "Id_Nr_Seryjny_Ser", 
+                      choices = dbGetQuery(con,"SELECT nr_seryjny FROM egzemplarz_broni
+                                            WHERE stan = 'dostepny';"),selected = "")
+    updateSelectInput(session, "Id_Serwisant_Ser", 
+                      choices = dbGetQuery(con,"SELECT id_serwisanta FROM serwisanci;"),selected = "")
+    updateSelectInput(session, "Id_Nr_Zlecenia_Ser", 
+                      choices = dbGetQuery(con,"SELECT nr_zlecenia_serwisu FROM serwis
+                                            WHERE notatka_z_naprawy = 'w trakcie serwisu';"),selected = "")
+    updateSelectInput(session, "Id_Kierwonika_K", 
+                      choices = dbGetQuery(con,"SELECT id_kierownika FROM kierownicy;")
+                      ,selected = "")
+    
+  })
+  output$mm <- renderUI({
+    m <- (dbGetQuery(con, paste0("SELECT rok_wynalezienia  FROM rodzaje_broni
+                                         WHERE id_rodzaju = ",input$Id_Rodzaju_E,";")))
+    if(m == "NULL"){
+      m <- 1800
+    }
+    else{
+      m <-strtoi(m)
+    }
+    tagList(
+      sliderInput("Id_Rok_Produkcji_E", "Rok Produkcji", min = m,
+                  max = strtoi(substr(Sys.Date(),1,4)), value= strtoi(substr(Sys.Date(),1,4)),
+                  step = 1)
+    )
+  })
+  output$rodz <-renderUI({
+    tagList(
+      if(input$rok_w == "Wybierz"){
+      sliderInput(inputId = "Id_Rok_R", label = "",
+                               min = 1800, max = strtoi(substr(Sys.Date(),1,4)), value = 1800)
+      
+      }
+      else{
+        selectInput(inputId =  "Id_Rok_R",label = "", choices = c("NULL"),selected = "NULL")
+      }
+    )
+    })
+}
